@@ -1,21 +1,68 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-* {
-  box-sizing: border-box;
+/* ── Theme tokens ── */
+:root {
+  --bg-page:        #fbfbf9;
+  --bg-surface:     #ffffff;
+  --bg-card:        #f6f6f3;
+  --bg-card-hover:  #ededea;
+  --border:         #dadad3;
+  --border-soft:    #e5e5e0;
+  --ink:            #000000;
+  --body:           #33332e;
+  --mute:           #62625b;
+  --ash:            #91918c;
+  --chip-bg:        #f6f6f3;
+  --chip-hover:     #e5e5e0;
+  --secondary-bg:   #e5e5e0;
+  --secondary-hover:#c8c8c1;
+  --primary:        #e60023;
+  --primary-hover:  #cc001f;
+  --pre-bg:         #fbfbf9;
+  --overlay-pill:   #ffffff;
+  --overlay-pill-t: #000000;
+  --scrim:          rgba(0,0,0,0.5);
+  --shadow-modal:   0 16px 48px rgba(0,0,0,0.22);
 }
+
+[data-theme="dark"] {
+  --bg-page:        #0a0e1c;
+  --bg-surface:     #0f1428;
+  --bg-card:        #141b35;
+  --bg-card-hover:  #1a2245;
+  --border:         #1e2d56;
+  --border-soft:    #1a2245;
+  --ink:            #e8edf8;
+  --body:           #b8c4dc;
+  --mute:           #6e84a8;
+  --ash:            #405070;
+  --chip-bg:        #141b35;
+  --chip-hover:     #1a2245;
+  --secondary-bg:   #1e2d56;
+  --secondary-hover:#263870;
+  --primary:        #e60023;
+  --primary-hover:  #cc001f;
+  --pre-bg:         #0a0e1c;
+  --overlay-pill:   rgba(255,255,255,0.12);
+  --overlay-pill-t: #e8edf8;
+  --scrim:          rgba(0,0,0,0.7);
+  --shadow-modal:   0 16px 64px rgba(0,0,0,0.6);
+}
+
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
-  background: #09090b;
-  color: #e4e4e7;
-  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg-page);
+  color: var(--body);
+  font-family: 'Inter', -apple-system, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
+.scrollbar-hide::-webkit-scrollbar { display: none; }

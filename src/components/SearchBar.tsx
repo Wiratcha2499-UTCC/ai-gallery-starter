@@ -5,23 +5,49 @@ interface SearchBarProps {
 
 export function SearchBar({ value, onChange }: SearchBarProps) {
   return (
-    <div className="relative w-full max-w-xl mx-auto">
-      <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-        <svg className="w-4 h-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    <div className="relative w-full">
+      <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+        <svg className="w-4 h-4" style={{ color: 'var(--mute)' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
       </div>
       <input
         type="text"
         value={value}
         onChange={e => onChange(e.target.value)}
-        placeholder="ค้นหา prompt..."
-        className="w-full pl-9 pr-4 py-2.5 bg-zinc-800 border border-zinc-700 rounded-xl text-zinc-100 placeholder-zinc-500 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+        placeholder="Search Prompt"
+        className="w-full pl-10 pr-10 text-sm focus:outline-none transition-all"
+        style={{
+          height: '48px',
+          borderRadius: '9999px',
+          background: value ? 'var(--bg-surface)' : 'var(--chip-bg)',
+          border: value ? '1px solid var(--border)' : '1px solid transparent',
+          color: 'var(--ink)',
+        }}
+        onFocus={e => {
+          e.currentTarget.style.background = 'var(--bg-surface)';
+          e.currentTarget.style.border = '1px solid var(--border)';
+          e.currentTarget.style.boxShadow = '0 0 0 4px rgba(67,94,229,0.12)';
+        }}
+        onBlur={e => {
+          if (!value) {
+            e.currentTarget.style.background = 'var(--chip-bg)';
+            e.currentTarget.style.border = '1px solid transparent';
+          }
+          e.currentTarget.style.boxShadow = 'none';
+        }}
       />
       {value && (
-        <button onClick={() => onChange('')} title="ล้างคำค้นหา" className="absolute inset-y-0 right-3 flex items-center text-zinc-400 hover:text-zinc-200">
+        <button
+          onClick={() => onChange('')}
+          title="ล้างคำค้นหา"
+          className="absolute inset-y-0 right-3 flex items-center transition-colors"
+          style={{ color: 'var(--mute)' }}
+          onMouseOver={e => (e.currentTarget.style.color = 'var(--ink)')}
+          onMouseOut={e => (e.currentTarget.style.color = 'var(--mute)')}
+        >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       )}

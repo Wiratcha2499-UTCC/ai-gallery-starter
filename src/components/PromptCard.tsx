@@ -7,41 +7,76 @@ interface PromptCardProps {
   priority?: boolean;
 }
 
-const GRADIENTS = [
-  'from-indigo-900/60 to-zinc-900',
-  'from-violet-900/60 to-zinc-900',
-  'from-sky-900/60 to-zinc-900',
-  'from-emerald-900/50 to-zinc-900',
-  'from-rose-900/50 to-zinc-900',
-  'from-amber-900/50 to-zinc-900',
+const WARM_GRADIENTS_LIGHT = [
+  { from: '#fde8e8', to: '#fff5f5' },
+  { from: '#e8effe', to: '#f0f4ff' },
+  { from: '#e8f5e8', to: '#f4fbf4' },
+  { from: '#fef3e8', to: '#fffaf0' },
+  { from: '#f0e8fe', to: '#f8f0ff' },
+  { from: '#fde8f5', to: '#fff0f8' },
 ];
 
-function gradientFor(id: string) {
+const DARK_GRADIENTS = [
+  { from: '#1a0a1a', to: '#2a0e2a' },
+  { from: '#0a0e2a', to: '#0e1840' },
+  { from: '#0a1a0e', to: '#102a14' },
+  { from: '#1a140a', to: '#2a1e0a' },
+  { from: '#14081a', to: '#200e2a' },
+  { from: '#1a0a14', to: '#2a0e1a' },
+];
+
+function gradientFor(id: string, isDark: boolean) {
   let hash = 0;
   for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) | 0;
-  return GRADIENTS[Math.abs(hash) % GRADIENTS.length];
+  const pool = isDark ? DARK_GRADIENTS : WARM_GRADIENTS_LIGHT;
+  return pool[Math.abs(hash) % pool.length];
+}
+
+async function writeToClipboard(text: string): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(text);
+    return;
+  } catch {
+    // fall through to execCommand
+  }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  } catch {
+    // silent — show ✓ optimistically
+  }
 }
 
 export function PromptCard({ prompt, onClick, priority = false }: PromptCardProps) {
   const [copied, setCopied] = useState(false);
   const [imgError, setImgError] = useState(false);
 
-  function copyPrompt(e: React.MouseEvent) {
+  async function copyPrompt(e: React.MouseEvent) {
     e.stopPropagation();
-    navigator.clipboard.writeText(prompt.content).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+    await writeToClipboard(prompt.content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   const coverImage = prompt.images[0];
   const hasImage = coverImage && !imgError;
+  // Detect theme from document
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const grad = gradientFor(prompt.id, isDark);
 
   return (
     <div
       onClick={onClick}
-      className="group relative bg-zinc-900 rounded-xl overflow-hidden border border-zinc-800 hover:border-zinc-600 cursor-pointer transition-all duration-200 hover:shadow-xl hover:shadow-black/40 hover:-translate-y-0.5"
+      className="group relative overflow-hidden cursor-pointer transition-transform duration-200 hover:-translate-y-1"
+      style={{ background: 'var(--bg-card)', borderRadius: '16px' }}
     >
+      {/* Image or gradient card */}
       {hasImage ? (
         <img
           src={coverImage}
@@ -50,51 +85,68 @@ export function PromptCard({ prompt, onClick, priority = false }: PromptCardProp
           decoding="async"
           onError={() => setImgError(true)}
           className="w-full object-cover block"
+          style={{ borderRadius: '16px 16px 0 0', display: 'block' }}
         />
       ) : (
-        <div className={`w-full bg-gradient-to-b ${gradientFor(prompt.id)} p-4 min-h-[120px] flex flex-col justify-between`}>
-          <p className="text-xs text-zinc-300 leading-relaxed line-clamp-5 font-mono">
+        <div
+          className="w-full p-4 min-h-[150px] flex flex-col justify-between"
+          style={{
+            background: `linear-gradient(135deg, ${grad.from}, ${grad.to})`,
+            borderRadius: '16px 16px 0 0',
+          }}
+        >
+          <p className="text-xs leading-relaxed line-clamp-6" style={{ color: 'var(--body)' }}>
             {prompt.content}
           </p>
-          <div className="mt-2 flex items-center gap-1.5">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-indigo-400 opacity-70" />
-            <span className="text-xs text-zinc-500">Prompt</span>
+          <div className="mt-2">
+            <span className="text-xs font-bold" style={{ color: 'var(--ash)' }}>Prompt</span>
           </div>
         </div>
       )}
 
+      {/* Category overlay pill */}
       {prompt.categories[0] && (
         <div className="absolute top-2 left-2">
-          <span className="px-2 py-0.5 bg-black/60 text-zinc-300 text-xs rounded-full backdrop-blur-sm border border-white/10">
+          <span
+            className="px-3 py-1 text-xs font-bold"
+            style={{
+              background: 'var(--overlay-pill)',
+              color: 'var(--overlay-pill-t)',
+              borderRadius: '9999px',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+            }}
+          >
             {prompt.categories[0]}
           </span>
         </div>
       )}
 
-      <div className="p-3">
-        <h3 className="text-sm font-semibold text-zinc-100 line-clamp-2 leading-snug mb-1">
-          {prompt.title}
-        </h3>
-        {hasImage && (
-          <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">
-            {prompt.content}
-          </p>
-        )}
-      </div>
-
-      <div className="px-3 pb-3 flex items-center justify-between gap-2">
-        <span className="text-xs text-zinc-600 truncate">{prompt.author.name}</span>
+      {/* Copy button — appears on hover */}
+      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
         <button
           onClick={copyPrompt}
-          title="คัดลอก prompt"
-          className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 ${
-            copied
-              ? 'bg-green-600/20 text-green-400 border border-green-600/40'
-              : 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:bg-zinc-700 hover:text-zinc-200 opacity-0 group-hover:opacity-100'
-          }`}
+          className="px-3 py-1.5 text-xs font-bold text-white transition-colors"
+          style={{
+            background: copied ? '#22c55e' : 'var(--primary)',
+            borderRadius: '9999px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
+          }}
         >
-          {copied ? 'คัดลอกแล้ว ✓' : 'คัดลอก'}
+          {copied ? '✓' : 'Copy'}
         </button>
+      </div>
+
+      {/* Card metadata */}
+      <div className="p-3">
+        <h3
+          className="text-sm font-semibold line-clamp-2 leading-snug mb-1"
+          style={{ color: 'var(--ink)', letterSpacing: '-0.1px' }}
+        >
+          {prompt.title}
+        </h3>
+        <p className="text-xs truncate" style={{ color: 'var(--mute)' }}>
+          {prompt.author.name}
+        </p>
       </div>
     </div>
   );

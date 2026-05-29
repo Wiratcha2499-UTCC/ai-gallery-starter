@@ -40,7 +40,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
       {value && (
         <button
           onClick={() => onChange('')}
-          title="ล้างคำค้นหา"
+          title="Clear search"
           className="absolute inset-y-0 right-3 flex items-center transition-colors"
           style={{ color: 'var(--mute)' }}
           onMouseOver={e => (e.currentTarget.style.color = 'var(--ink)')}

@@ -1,10 +1,14 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import confetti from 'canvas-confetti';
 import { usePrompts } from './hooks/usePrompts';
 import { PromptCard } from './components/PromptCard';
 import { SearchBar } from './components/SearchBar';
 import { CategoryFilter } from './components/CategoryFilter';
-
 import { PromptModal } from './components/PromptModal';
+import { LoginModal } from './components/LoginModal';
+import { UnlockModal } from './components/UnlockModal';
+import { useAuth } from './context/AuthContext';
+import { fetchPaidStatus } from './lib/pb';
 import type { Prompt } from './types';
 
 
@@ -27,11 +31,16 @@ function MoonIcon() {
 
 export default function App() {
   const { data, loading } = usePrompts();
+  const { user, logout, pbError, refreshPaid } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedLanguage] = useState('en');  // English by default
   const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
   const [visibleCount, setVisibleCount] = useState(24);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
+  const [paymentBanner, setPaymentBanner] = useState<'success' | 'unlocked' | 'pending' | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── Theme ──
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
@@ -48,6 +57,42 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
     localStorage.setItem('theme', darkMode ? 'dark' : 'light');
   }, [darkMode]);
+
+  // ── Payment success detection ──
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('success') !== 'true') return;
+    window.history.replaceState({}, '', '/');
+    setPaymentBanner('success');
+
+    // 3-second confetti burst from both sides
+    const end = Date.now() + 3000;
+    const fireConfetti = () => {
+      confetti({ particleCount: 6, angle: 60, spread: 55, origin: { x: 0, y: 0.65 }, zIndex: 9999 });
+      confetti({ particleCount: 6, angle: 120, spread: 55, origin: { x: 1, y: 0.65 }, zIndex: 9999 });
+      if (Date.now() < end) requestAnimationFrame(fireConfetti);
+    };
+    requestAnimationFrame(fireConfetti);
+    // Auto-dismiss banner after confetti ends
+    setTimeout(() => setPaymentBanner(prev => prev === 'success' ? null : prev), 3500);
+
+    let attempts = 0;
+    pollRef.current = setInterval(async () => {
+      if (!user?.email) return;
+      attempts++;
+      const result = await fetchPaidStatus(user.email);
+      if (result?.paid) {
+        clearInterval(pollRef.current!);
+        await refreshPaid();
+        setPaymentBanner('unlocked');
+        setTimeout(() => setPaymentBanner(null), 6000);
+      } else if (attempts >= 8) {
+        clearInterval(pollRef.current!);
+        setPaymentBanner('pending');
+      }
+    }, 2000);
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function goHome() {
     setSearchQuery('');
@@ -120,13 +165,50 @@ export default function App() {
             <SearchBar value={searchQuery} onChange={v => { setSearchQuery(v); setVisibleCount(24); }} />
           </div>
 
-          {/* Right: count + theme toggle */}
+          {/* Right: count + login/avatar + theme toggle */}
           <div className="shrink-0 flex items-center gap-2">
             {!loading && data && (
               <span className="text-xs font-medium hidden md:block" style={{ color: 'var(--mute)' }}>
                 {data.total.toLocaleString()} prompts
               </span>
             )}
+
+            {/* Auth area */}
+            {user ? (
+              <div className="flex items-center gap-2">
+                <img
+                  src={user.picture}
+                  alt={user.name}
+                  referrerPolicy="no-referrer"
+                  className="w-8 h-8 rounded-full shrink-0"
+                  style={{ border: '2px solid var(--border)' }}
+                />
+                <span className="text-sm font-medium hidden sm:block max-w-[96px] truncate" style={{ color: 'var(--ink)' }}>
+                  {user.name}
+                </span>
+                <button
+                  onClick={logout}
+                  className="text-xs px-2.5 py-1 rounded-full transition-colors"
+                  style={{ background: 'var(--chip-bg)', color: 'var(--mute)' }}
+                  onMouseOver={e => (e.currentTarget.style.background = 'var(--chip-hover)')}
+                  onMouseOut={e => (e.currentTarget.style.background = 'var(--chip-bg)')}
+                  title="Sign out"
+                >
+                  Sign out
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowLoginModal(true)}
+                className="px-4 py-1.5 text-sm font-bold text-white rounded-full transition-colors"
+                style={{ background: 'var(--primary)' }}
+                onMouseOver={e => (e.currentTarget.style.background = 'var(--primary-hover)')}
+                onMouseOut={e => (e.currentTarget.style.background = 'var(--primary)')}
+              >
+                Sign in
+              </button>
+            )}
+
             <button
               onClick={() => setDarkMode(d => !d)}
               className="flex items-center justify-center w-9 h-9 rounded-full transition-colors"
@@ -154,6 +236,30 @@ export default function App() {
 
       </header>
 
+      {/* ── DB error banner ── */}
+      {pbError && (
+        <div className="w-full px-4 py-2 text-xs font-medium text-center" style={{ background: '#fef2f2', color: '#dc2626', borderBottom: '1px solid #fecaca' }}>
+          ⚠️ {pbError}
+        </div>
+      )}
+
+      {/* ── Payment banners ── */}
+      {paymentBanner === 'success' && (
+        <div className="w-full px-4 py-2 text-sm font-bold text-center" style={{ background: '#f0fdf4', color: '#16a34a', borderBottom: '1px solid #bbf7d0' }}>
+          🎉 Unlocked!
+        </div>
+      )}
+      {paymentBanner === 'unlocked' && (
+        <div className="w-full px-4 py-2 text-sm font-bold text-center" style={{ background: '#f0fdf4', color: '#16a34a', borderBottom: '1px solid #bbf7d0' }}>
+          🎉 Unlocked!
+        </div>
+      )}
+      {paymentBanner === 'pending' && (
+        <div className="w-full px-4 py-2 text-xs font-medium text-center" style={{ background: '#fffbeb', color: '#92400e', borderBottom: '1px solid #fde68a' }}>
+          Payment received — refresh the page if copy is not unlocked yet.
+        </div>
+      )}
+
       {/* ── Main ── */}
       <main className="flex-1 max-w-[1280px] mx-auto w-full px-3 sm:px-6 py-6">
         {loading ? (
@@ -162,22 +268,22 @@ export default function App() {
               className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin"
               style={{ borderColor: 'var(--primary)', borderTopColor: 'transparent' }}
             />
-            <p className="text-sm" style={{ color: 'var(--mute)' }}>กำลังโหลด prompt...</p>
+            <p className="text-sm" style={{ color: 'var(--mute)' }}>Loading prompts...</p>
           </div>
         ) : displayPrompts.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-32 gap-3">
             <div className="w-16 h-16 flex items-center justify-center text-3xl rounded-full" style={{ background: 'var(--chip-bg)' }}>
               🔍
             </div>
-            <p className="font-semibold" style={{ color: 'var(--ink)' }}>ไม่พบ prompt ที่ค้นหา</p>
-            <p className="text-sm" style={{ color: 'var(--mute)' }}>ลองค้นหาคำอื่น หรือยกเลิกตัวกรอง</p>
+            <p className="font-semibold" style={{ color: 'var(--ink)' }}>No prompts found</p>
+            <p className="text-sm" style={{ color: 'var(--mute)' }}>Try a different keyword or clear the filter</p>
           </div>
         ) : (
           <>
             <div className="columns-2 sm:columns-3 md:columns-4 lg:columns-5 gap-2 sm:gap-3">
               {displayPrompts.slice(0, visibleCount).map((p, i) => (
                 <div key={p.id} className="break-inside-avoid mb-2 sm:mb-3">
-                  <PromptCard prompt={p} onClick={() => setSelectedPrompt(p)} priority={i < 8} />
+                  <PromptCard prompt={p} onClick={() => setSelectedPrompt(p)} priority={i < 8} onRequestLogin={() => setShowLoginModal(true)} onRequestUnlock={() => setShowUnlockModal(true)} />
                 </div>
               ))}
             </div>
@@ -210,7 +316,9 @@ export default function App() {
         </div>
       </footer>
 
-      <PromptModal prompt={selectedPrompt} onClose={() => setSelectedPrompt(null)} />
+      <PromptModal prompt={selectedPrompt} onClose={() => setSelectedPrompt(null)} onRequestLogin={() => setShowLoginModal(true)} onRequestUnlock={() => setShowUnlockModal(true)} />
+      <LoginModal open={showLoginModal} onClose={() => setShowLoginModal(false)} />
+      <UnlockModal open={showUnlockModal} onClose={() => setShowUnlockModal(false)} userEmail={user?.email} userName={user?.name} />
 
       {/* ── Scroll to top ── */}
       <button
@@ -224,7 +332,7 @@ export default function App() {
           transform: showTop ? 'translateY(0)' : 'translateY(16px)',
         }}
         aria-label="Scroll to top"
-        title="กลับขึ้นบนสุด"
+        title="Back to top"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />

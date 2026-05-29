@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import type { Prompt } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 interface PromptModalProps {
   prompt: Prompt | null;
   onClose: () => void;
+  onRequestLogin?: () => void;
+  onRequestUnlock?: () => void;
 }
 
 async function writeToClipboard(text: string): Promise<void> {
@@ -27,7 +30,8 @@ async function writeToClipboard(text: string): Promise<void> {
   }
 }
 
-export function PromptModal({ prompt, onClose }: PromptModalProps) {
+export function PromptModal({ prompt, onClose, onRequestLogin, onRequestUnlock }: PromptModalProps) {
+  const { user } = useAuth();
   const [copied, setCopied] = useState(false);
   const [activeImg, setActiveImg] = useState(0);
   const [lightbox, setLightbox] = useState(false);
@@ -53,7 +57,11 @@ export function PromptModal({ prompt, onClose }: PromptModalProps) {
 
   if (!prompt) return null;
 
+  const canCopy = !!user?.paid;
+
   async function copyPrompt() {
+    if (!user) { onRequestLogin?.(); return; }
+    if (!canCopy) { onRequestUnlock?.(); return; }
     await writeToClipboard(prompt!.content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -125,7 +133,7 @@ export function PromptModal({ prompt, onClose }: PromptModalProps) {
             style={{ background: 'var(--chip-bg)', color: 'var(--ink)' }}
             onMouseOver={e => (e.currentTarget.style.background = 'var(--chip-hover)')}
             onMouseOut={e => (e.currentTarget.style.background = 'var(--chip-bg)')}
-            title="ปิด"
+            title="Close"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
@@ -153,7 +161,7 @@ export function PromptModal({ prompt, onClose }: PromptModalProps) {
                     <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                     </svg>
-                    ดูภาพเต็ม
+                    View full image
                   </div>
                 </div>
               </div>
@@ -237,11 +245,11 @@ export function PromptModal({ prompt, onClose }: PromptModalProps) {
                   onMouseOver={e => { if (!copied) e.currentTarget.style.background = 'var(--primary-hover)'; }}
                   onMouseOut={e => { if (!copied) e.currentTarget.style.background = 'var(--primary)'; }}
                 >
-                  {copied ? 'Copied ✓' : '📋 Copy Prompt'}
+                  {!user ? '🔒 Sign in to copy' : !canCopy ? '🔒 Unlock $4.99' : copied ? 'Copied ✓' : '📋 Copy Prompt'}
                 </button>
               </div>
               <pre
-                className="text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap"
+                className="text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap transition-all duration-300"
                 style={{
                   background: 'var(--pre-bg)',
                   borderRadius: '16px',
@@ -249,6 +257,8 @@ export function PromptModal({ prompt, onClose }: PromptModalProps) {
                   color: 'var(--body)',
                   border: '1px solid var(--border-soft)',
                   fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
+                  filter: !canCopy ? 'blur(4px)' : 'none',
+                  userSelect: !canCopy ? 'none' : 'auto',
                 }}
               >
                 {prompt.content}

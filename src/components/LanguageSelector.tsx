@@ -4,8 +4,8 @@ interface LanguageSelectorProps {
 }
 
 const LANGS = [
-  { code: '',   flag: '🌐', label: 'ทั้งหมด' },
-  { code: 'th', flag: '🇹🇭', label: 'ไทย'    },
+  { code: '',   flag: '🌐', label: 'All'     },
+  { code: 'th', flag: '🇹🇭', label: 'Thai'   },
   { code: 'en', flag: '🇺🇸', label: 'English' },
   { code: 'es', flag: '🇪🇸', label: 'Español' },
   { code: 'ja', flag: '🇯🇵', label: '日本語'   },
@@ -15,7 +15,7 @@ const LANGS = [
 export function LanguageSelector({ selected, onChange }: LanguageSelectorProps) {
   return (
     <div className="flex items-center gap-1.5 flex-wrap">
-      <span className="text-xs font-bold shrink-0" style={{ color: 'var(--ash)' }}>ภาษา:</span>
+      <span className="text-xs font-bold shrink-0" style={{ color: 'var(--ash)' }}>Language:</span>
       {LANGS.map(lang => {
         const active = lang.code === selected;
         return (

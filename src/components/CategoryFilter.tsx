@@ -107,7 +107,7 @@ export function CategoryFilter({ categories, selected, onToggle }: CategoryFilte
               onClick={() => scrollEnd('start')}
               className="w-8 h-8 flex items-center justify-center rounded-full shadow-md transition-colors"
               style={{ background: 'var(--bg-surface)', color: 'var(--ink)', border: '1px solid var(--border)' }}
-              title="ไปสุดซ้าย"
+              title="Jump to start"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M11 19l-7-7 7-7M18 19l-7-7 7-7" />
@@ -117,7 +117,7 @@ export function CategoryFilter({ categories, selected, onToggle }: CategoryFilte
               onClick={() => scrollStep('left')}
               className="w-8 h-8 flex items-center justify-center rounded-full shadow-md transition-colors"
               style={{ background: 'var(--bg-surface)', color: 'var(--ink)', border: '1px solid var(--border)' }}
-              title="เลื่อนซ้าย"
+              title="Scroll left"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -139,7 +139,7 @@ export function CategoryFilter({ categories, selected, onToggle }: CategoryFilte
               onClick={() => scrollStep('right')}
               className="w-8 h-8 flex items-center justify-center rounded-full shadow-md transition-colors"
               style={{ background: 'var(--bg-surface)', color: 'var(--ink)', border: '1px solid var(--border)' }}
-              title="เลื่อนขวา"
+              title="Scroll right"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
@@ -149,7 +149,7 @@ export function CategoryFilter({ categories, selected, onToggle }: CategoryFilte
               onClick={() => scrollEnd('end')}
               className="w-8 h-8 flex items-center justify-center rounded-full shadow-md transition-colors"
               style={{ background: 'var(--bg-surface)', color: 'var(--ink)', border: '1px solid var(--border)' }}
-              title="ไปสุดขวา"
+              title="Jump to end"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7M6 5l7 7-7 7" />

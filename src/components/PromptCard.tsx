@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import type { Prompt } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 interface PromptCardProps {
   prompt: Prompt;
   onClick: () => void;
   priority?: boolean;
+  onRequestLogin?: () => void;
+  onRequestUnlock?: () => void;
 }
 
 const WARM_GRADIENTS_LIGHT = [
@@ -53,12 +56,17 @@ async function writeToClipboard(text: string): Promise<void> {
   }
 }
 
-export function PromptCard({ prompt, onClick, priority = false }: PromptCardProps) {
+export function PromptCard({ prompt, onClick, priority = false, onRequestLogin, onRequestUnlock }: PromptCardProps) {
+  const { user } = useAuth();
   const [copied, setCopied] = useState(false);
   const [imgError, setImgError] = useState(false);
 
+  const canCopy = !!user?.paid;
+
   async function copyPrompt(e: React.MouseEvent) {
     e.stopPropagation();
+    if (!user) { onRequestLogin?.(); return; }
+    if (!canCopy) { onRequestUnlock?.(); return; }
     await writeToClipboard(prompt.content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -95,7 +103,14 @@ export function PromptCard({ prompt, onClick, priority = false }: PromptCardProp
             borderRadius: '16px 16px 0 0',
           }}
         >
-          <p className="text-xs leading-relaxed line-clamp-6" style={{ color: 'var(--body)' }}>
+          <p
+            className="text-xs leading-relaxed line-clamp-6 transition-all duration-300"
+            style={{
+              color: 'var(--body)',
+              filter: !canCopy ? 'blur(3px)' : 'none',
+              userSelect: !canCopy ? 'none' : 'auto',
+            }}
+          >
             {prompt.content}
           </p>
           <div className="mt-2">
@@ -131,8 +146,9 @@ export function PromptCard({ prompt, onClick, priority = false }: PromptCardProp
             borderRadius: '9999px',
             boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
           }}
+          title={!user ? 'Sign in to copy' : !canCopy ? 'Unlock to copy' : undefined}
         >
-          {copied ? '✓' : 'Copy'}
+          {!user ? '🔒' : !canCopy ? 'Unlock' : copied ? '✓' : 'Copy'}
         </button>
       </div>
 

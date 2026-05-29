@@ -209,7 +209,7 @@ export default function App() {
                 <button
                   onClick={logout}
                   className="text-xs px-2.5 py-1 rounded-full transition-colors"
-                  style={{ background: 'var(--chip-bg)', color: 'var(--mute)' }}
+                  style={{ background: 'var(--chip-bg)', color: 'var(--mute)', border: '1px solid #ffffff' }}
                   onMouseOver={e => (e.currentTarget.style.background = 'var(--chip-hover)')}
                   onMouseOut={e => (e.currentTarget.style.background = 'var(--chip-bg)')}
                   title={tr.signOut}

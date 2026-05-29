@@ -89,9 +89,9 @@ export const t = {
     signInToRead: 'เข้าสู่ระบบเพื่ออ่าน Prompt',
     unlockToRead: 'ปลดล็อกเพื่ออ่าน Prompt เต็ม',
     signInBtn: 'เข้าสู่ระบบ',
-    unlockBtn: 'ปลดล็อก $4.99',
+    unlockBtn: 'ปลดล็อก 199 บาท',
     signInToReadBtn: '🔒 เข้าสู่ระบบเพื่อคัดลอก',
-    unlockToReadBtn: '🔒 ปลดล็อก $4.99',
+    unlockToReadBtn: '🔒 ปลดล็อก 199 บาท',
     // Login Modal
     loginTitle: 'เข้าสู่ระบบเพื่อคัดลอก Prompt',
     loginSub: 'ใช้บัญชี Google — ฟรี',

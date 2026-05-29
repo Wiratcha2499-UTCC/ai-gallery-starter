@@ -54,10 +54,11 @@ export function UnlockModal({ open, onClose, userEmail, userName }: UnlockModalP
 
   return (
     <div
-      className="fixed inset-0 z-[55] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[55] overflow-y-auto"
       style={{ background: 'var(--scrim)' }}
       onClick={onClose}
     >
+      <div className="flex min-h-full items-center justify-center p-4">
       <div
         className="relative w-full max-w-md p-8 flex flex-col gap-5"
         style={{
@@ -144,6 +145,7 @@ export function UnlockModal({ open, onClose, userEmail, userName }: UnlockModalP
             Cancel
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

@@ -32,9 +32,9 @@ export const t = {
     signInToRead: 'Sign in to read this prompt',
     unlockToRead: 'Unlock to read full prompt',
     signInBtn: 'Sign in',
-    unlockBtn: 'Unlock $4.99',
+    unlockBtn: 'Unlock $5.99',
     signInToReadBtn: '🔒 Sign in to copy',
-    unlockToReadBtn: '🔒 Unlock $4.99',
+    unlockToReadBtn: '🔒 Unlock $5.99',
     // Login Modal
     loginTitle: 'Sign in to copy prompts',
     loginSub: 'Use your Google account — it\'s free',
@@ -47,9 +47,9 @@ export const t = {
       'One-time payment — no monthly fees, no subscription',
       'Lifetime access on your Google account',
     ],
-    price: '$4.99',
+    price: '$5.99',
     oneTime: 'one-time · no subscription',
-    payBtn: 'Pay $4.99 →',
+    payBtn: 'Pay $5.99 →',
     cancel: 'Cancel',
     redirecting: 'Redirecting...',
     // Banners

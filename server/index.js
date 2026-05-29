@@ -61,21 +61,28 @@ app.post('/api/create-checkout', async (req, res) => {
 });
 
 async function updatePaidStatus(email, stripeCustomerId) {
-  // Find user by email
+  const filter = encodeURIComponent(`email = "${email}"`);
   const listRes = await fetch(
-    `${PB_URL}/api/collections/smartpromptai_users/records?filter=${encodeURIComponent(`email='${email}'`)}&perPage=1`
+    `${PB_URL}/api/collections/smartpromptai_users/records?filter=${filter}&perPage=1`
   );
   const listData = await listRes.json();
 
+  const updateBody = { paid: true };
+  if (stripeCustomerId) updateBody.stripe_customer_id = stripeCustomerId;
+
   if (!listData.items || listData.items.length === 0) {
-    console.warn(`[PocketBase] user not found: ${email}`);
+    // User not in DB yet — create with paid=true so next login picks it up
+    console.log(`[PocketBase] user not found, creating with paid=true: ${email}`);
+    updateBody.email = email;
+    await fetch(`${PB_URL}/api/collections/smartpromptai_users/records`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updateBody),
+    });
     return;
   }
 
   const userId = listData.items[0].id;
-  const updateBody = { paid: true };
-  if (stripeCustomerId) updateBody.stripe_customer_id = stripeCustomerId;
-
   await fetch(`${PB_URL}/api/collections/smartpromptai_users/records/${userId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },

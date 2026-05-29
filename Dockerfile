@@ -13,13 +13,13 @@ COPY server/package*.json ./
 RUN npm ci --omit=dev
 COPY server/ .
 
-# Stage 3: Final image — nginx + Node.js
-FROM nginx:alpine
-RUN apk add --no-cache nodejs
+# Stage 3: Final — Node.js base + nginx
+FROM node:22-alpine
+RUN apk add --no-cache nginx
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY --from=server-builder /server /server
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/http.d/default.conf
 COPY start.sh /start.sh
-RUN chmod +x /start.sh
+RUN sed -i 's/\r//' /start.sh && chmod +x /start.sh
 EXPOSE 80
 CMD ["/start.sh"]

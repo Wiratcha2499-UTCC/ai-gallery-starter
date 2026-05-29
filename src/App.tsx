@@ -221,7 +221,7 @@ export default function App() {
               <button
                 onClick={() => setShowLoginModal(true)}
                 className="px-4 py-1.5 text-sm font-bold text-white rounded-full transition-colors"
-                style={{ background: 'var(--primary)' }}
+                style={{ background: 'var(--primary)', border: '1px solid #ffffff' }}
                 onMouseOver={e => (e.currentTarget.style.background = 'var(--primary-hover)')}
                 onMouseOut={e => (e.currentTarget.style.background = 'var(--primary)')}
               >
@@ -234,7 +234,7 @@ export default function App() {
               {/* Facebook */}
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"
                 className="flex items-center justify-center w-8 h-8 rounded-full transition-opacity hover:opacity-80"
-                style={{ background: '#1877F2', color: '#ffffff' }}
+                style={{ background: '#1877F2', color: '#ffffff', border: '1px solid #ffffff' }}
                 title="Facebook"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -244,7 +244,7 @@ export default function App() {
               {/* TikTok */}
               <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer"
                 className="flex items-center justify-center w-8 h-8 rounded-full transition-opacity hover:opacity-80"
-                style={{ background: '#010101', color: '#ffffff' }}
+                style={{ background: '#010101', color: '#ffffff', border: '1px solid #ffffff' }}
                 title="TikTok"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -254,7 +254,7 @@ export default function App() {
               {/* LINE */}
               <a href="https://line.me" target="_blank" rel="noopener noreferrer"
                 className="flex items-center justify-center w-8 h-8 rounded-full transition-opacity hover:opacity-80"
-                style={{ background: '#00B900', color: '#ffffff' }}
+                style={{ background: '#00B900', color: '#ffffff', border: '1px solid #ffffff' }}
                 title="LINE"
               >
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

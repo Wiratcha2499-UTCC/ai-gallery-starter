@@ -101,7 +101,7 @@ export function UnlockModal({ open, onClose, userEmail, userName }: UnlockModalP
 
         {/* Price — centered, $4.99 on top */}
         <div className="flex flex-col items-center gap-0.5">
-          <span className="text-4xl font-bold" style={{ color: 'var(--ink)', letterSpacing: '-1.5px' }}>$4.99</span>
+          <span className="text-4xl font-bold" style={{ color: 'var(--ink)', letterSpacing: '-1.5px' }}>{tr.price}</span>
           <span className="text-sm" style={{ color: 'var(--mute)' }}>{tr.oneTime}</span>
         </div>
 

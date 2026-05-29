@@ -47,6 +47,7 @@ export const t = {
       'One-time payment — no monthly fees, no subscription',
       'Lifetime access on your Google account',
     ],
+    price: '$4.99',
     oneTime: 'one-time · no subscription',
     payBtn: 'Pay $4.99 →',
     cancel: 'Cancel',
@@ -103,8 +104,9 @@ export const t = {
       'ชำระครั้งเดียว — ไม่มีรายเดือน ไม่มี subscription',
       'ใช้งานตลอดชีวิตด้วยบัญชี Google ของคุณ',
     ],
+    price: '199 บาท',
     oneTime: 'ชำระครั้งเดียว · ไม่มีรายเดือน',
-    payBtn: 'ชำระ $4.99 →',
+    payBtn: 'ชำระ 199 บาท →',
     cancel: 'ยกเลิก',
     redirecting: 'กำลังเปลี่ยนหน้า...',
     // Banners

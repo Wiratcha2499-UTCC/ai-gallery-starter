@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
+import { useLang } from '../context/LangContext';
+import { t } from '../i18n/translations';
 
 interface LoginModalProps {
   open: boolean;
@@ -9,6 +11,8 @@ interface LoginModalProps {
 
 export function LoginModal({ open, onClose }: LoginModalProps) {
   const { login } = useAuth();
+  const { lang } = useLang();
+  const tr = t[lang];
 
   useEffect(() => {
     if (!open) return;
@@ -64,10 +68,10 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
         {/* Text */}
         <div className="text-center space-y-1.5">
           <h2 className="text-lg font-bold" style={{ color: 'var(--ink)', letterSpacing: '-0.3px' }}>
-            Sign in to copy prompts
+            {tr.loginTitle}
           </h2>
           <p className="text-sm" style={{ color: 'var(--mute)' }}>
-            Use your Google account — it's free
+            {tr.loginSub}
           </p>
         </div>
 

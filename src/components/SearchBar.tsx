@@ -1,9 +1,10 @@
 interface SearchBarProps {
   value: string;
   onChange: (v: string) => void;
+  placeholder?: string;
 }
 
-export function SearchBar({ value, onChange }: SearchBarProps) {
+export function SearchBar({ value, onChange, placeholder = 'Search Prompt' }: SearchBarProps) {
   return (
     <div className="relative w-full">
       <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
@@ -15,7 +16,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
         type="text"
         value={value}
         onChange={e => onChange(e.target.value)}
-        placeholder="Search Prompt"
+        placeholder={placeholder}
         className="w-full pl-10 pr-10 text-sm focus:outline-none transition-all"
         style={{
           height: '48px',

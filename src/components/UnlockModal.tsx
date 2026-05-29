@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useLang } from '../context/LangContext';
+import { t } from '../i18n/translations';
 
 interface UnlockModalProps {
   open: boolean;
@@ -7,14 +9,9 @@ interface UnlockModalProps {
   userName?: string;
 }
 
-const BENEFITS = [
-  'Copy all 215+ AI prompts instantly',
-  'Access new prompts added in the future — free',
-  'One-time payment — no monthly fees, no subscription',
-  'Lifetime access on your Google account',
-];
-
 export function UnlockModal({ open, onClose, userEmail, userName }: UnlockModalProps) {
+  const { lang } = useLang();
+  const tr = t[lang];
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -81,17 +78,17 @@ export function UnlockModal({ open, onClose, userEmail, userName }: UnlockModalP
           </svg>
         </button>
 
-        {/* Header */}
-        <div>
+        {/* Header — centered */}
+        <div className="text-center">
           <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--ink)', letterSpacing: '-0.3px' }}>
-            What you'll get
+            {tr.unlockTitle}
           </h2>
-          <p className="text-sm" style={{ color: 'var(--mute)' }}>Unlock all prompts with a single payment</p>
+          <p className="text-sm" style={{ color: 'var(--mute)' }}>{tr.unlockSub}</p>
         </div>
 
         {/* Benefits */}
         <ul className="flex flex-col gap-3">
-          {BENEFITS.map(b => (
+          {tr.benefits.map(b => (
             <li key={b} className="flex items-start gap-3">
               <span className="text-base mt-0.5">✅</span>
               <span className="text-sm leading-relaxed" style={{ color: 'var(--body)' }}>{b}</span>
@@ -102,10 +99,10 @@ export function UnlockModal({ open, onClose, userEmail, userName }: UnlockModalP
         {/* Divider */}
         <div style={{ borderTop: '1px solid var(--border-soft)' }} />
 
-        {/* Price */}
-        <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-bold" style={{ color: 'var(--ink)', letterSpacing: '-1px' }}>$4.99</span>
-          <span className="text-sm" style={{ color: 'var(--mute)' }}>one-time · no subscription</span>
+        {/* Price — centered, $4.99 on top */}
+        <div className="flex flex-col items-center gap-0.5">
+          <span className="text-4xl font-bold" style={{ color: 'var(--ink)', letterSpacing: '-1.5px' }}>$4.99</span>
+          <span className="text-sm" style={{ color: 'var(--mute)' }}>{tr.oneTime}</span>
         </div>
 
         {/* Error */}
@@ -129,10 +126,10 @@ export function UnlockModal({ open, onClose, userEmail, userName }: UnlockModalP
             {loading ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Redirecting...
+                {tr.redirecting}
               </>
             ) : (
-              'Pay $4.99 →'
+              tr.payBtn
             )}
           </button>
           <button
@@ -142,7 +139,7 @@ export function UnlockModal({ open, onClose, userEmail, userName }: UnlockModalP
             onMouseOver={e => (e.currentTarget.style.background = 'var(--chip-hover)')}
             onMouseOut={e => (e.currentTarget.style.background = 'var(--chip-bg)')}
           >
-            Cancel
+            {tr.cancel}
           </button>
         </div>
       </div>

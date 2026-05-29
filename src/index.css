@@ -5,6 +5,7 @@
 :root {
   --bg-page:        #fbfbf9;
   --bg-surface:     #ffffff;
+  --nav-bg:         rgba(251,251,249,0.96);
   --bg-card:        #f6f6f3;
   --bg-card-hover:  #ededea;
   --border:         #dadad3;
@@ -29,6 +30,7 @@
 [data-theme="dark"] {
   --bg-page:        #0a0e1c;
   --bg-surface:     #0f1428;
+  --nav-bg:         rgba(10,14,28,0.97);
   --bg-card:        #141b35;
   --bg-card-hover:  #1a2245;
   --border:         #1e2d56;

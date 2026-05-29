@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import type { Prompt } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { useLang } from '../context/LangContext';
+import { t } from '../i18n/translations';
 
 interface PromptCardProps {
   prompt: Prompt;
@@ -58,6 +60,8 @@ async function writeToClipboard(text: string): Promise<void> {
 
 export function PromptCard({ prompt, onClick, priority = false, onRequestLogin, onRequestUnlock }: PromptCardProps) {
   const { user } = useAuth();
+  const { lang } = useLang();
+  const tr = t[lang];
   const [copied, setCopied] = useState(false);
   const [imgError, setImgError] = useState(false);
 
@@ -146,9 +150,9 @@ export function PromptCard({ prompt, onClick, priority = false, onRequestLogin, 
             borderRadius: '9999px',
             boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
           }}
-          title={!user ? 'Sign in to copy' : !canCopy ? 'Unlock to copy' : undefined}
+          title={!user ? tr.signInToCopy : !canCopy ? tr.unlockToCopy : undefined}
         >
-          {!user ? '🔒' : !canCopy ? 'Unlock' : copied ? '✓' : 'Copy'}
+          {!user ? '🔒' : !canCopy ? tr.unlock : copied ? tr.copied : tr.copy}
         </button>
       </div>
 

@@ -206,18 +206,6 @@ export default function App() {
             </span>
             <span className="text-xs" style={{ color: 'var(--mute)' }}>© 2026</span>
           </div>
-          <a
-            href="https://github.com/Wiratcha2499-UTCC/ai-gallery-starter"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs transition-colors"
-            style={{ color: 'var(--mute)' }}
-            onMouseOver={e => (e.currentTarget.style.color = 'var(--ink)')}
-            onMouseOut={e => (e.currentTarget.style.color = 'var(--mute)')}
-          >
-            {GITHUB_ICON}
-            Fork on GitHub
-          </a>
         </div>
       </footer>
 
